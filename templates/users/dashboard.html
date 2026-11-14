@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3 mb-4 border-bottom border-secondary">
+        <div>
+            <h2 class="fw-bold text-white mb-1">Olá, {{ session.get('user_nome', 'Cliente') }}! 👋</h2>
+            <p class="text-muted small mb-0">Bem-vindo à sua área na Hamburgueria Recreio.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('views_bp.index') }}" class="btn btn-warning fw-bold rounded-pill px-4">
+                🍔 Fazer Pedido
+            </a>
+            <a href="{{ url_for('views_bp.profile') }}" class="btn btn-outline-light rounded-pill px-3">
+                ⚙️ Meu Perfil
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Coluna Principal: Meus Pedidos -->
+        <div class="col-lg-8">
+            <div class="card border-secondary p-4 h-100" style="background-color: #181818; border-radius: 15px;">
+                <h5 class="fw-bold text-white mb-3">Meus Pedidos Recentes</h5>
+                
+                <div class="text-center py-5 text-muted">
+                    <div style="font-size: 2.5rem;">🍔</div>
+                    <p class="mt-2 mb-3">Você ainda não realizou nenhum pedido por aqui.</p>
+                    <a href="{{ url_for('views_bp.index') }}" class="btn btn-sm btn-warning fw-bold rounded-pill px-3">
+                        Explorar Cardápio
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna Lateral: Fidelidade e Atalhos -->
+        <div class="col-lg-4">
+            <div class="card border-secondary p-4 mb-3" style="background-color: #181818; border-radius: 15px;">
+                <h6 class="fw-bold text-warning mb-2">⭐ Cartão Fidelidade</h6>
+                <p class="small text-muted mb-2">A cada 10 pedidos, você ganha 1 hambúrguer artesanal por nossa conta!</p>
+                <div class="progress mb-2" style="height: 10px; background-color: #2b2b2b;">
+                    <div class="progress-bar bg-warning" style="width: 10%;"></div>
+                </div>
+                <small class="text-light">0 de 10 pedidos concluídos</small>
+            </div>
+
+            <div class="card border-secondary p-4" style="background-color: #181818; border-radius: 15px;">
+                <h6 class="fw-bold text-white mb-3">Acesso Rápido</h6>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('views_bp.profile') }}" class="btn btn-sm btn-outline-secondary text-light text-start">
+                        👤 Dados da Conta
+                    </a>
+                    <a href="{{ url_for('views_bp.contact') }}" class="btn btn-sm btn-outline-secondary text-light text-start">
+                        💬 Suporte / Contato
+                    </a>
+                    <a href="{{ url_for('views_bp.logout') }}" class="btn btn-sm btn-outline-danger text-start">
+                        🚪 Sair da Conta
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

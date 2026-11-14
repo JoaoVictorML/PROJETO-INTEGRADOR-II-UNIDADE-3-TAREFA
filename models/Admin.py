@@ -7,23 +7,23 @@ class Admin(Base):
     __tablename__ = "admins"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    nome = Column(String(150), nullable=False)
+    name = Column(String(150), nullable=False)
     email = Column(String(150), nullable=False, unique=True)
-    password = Column(String(255), nullable=False)  # guarda o HASH, nunca a senha pura
-    cargo = Column(String(100), nullable=False, default="Administrador")
+    password = Column(String(255), nullable=False)
+    position = Column(String(100), nullable=False, default="Administrador")
     salario = Column(Numeric(10, 2), nullable=False, default=0)
-    telefone = Column(String(20), nullable=True)
-    ativo = Column(Boolean, nullable=False, default=True)
-    criado_em = Column(DateTime, nullable=False, default=datetime.now)
+    phone = Column(String(20), nullable=True)
+    active = Column(Boolean, nullable=False, default=True)
+    data_created = Column(DateTime, nullable=False, default=datetime.now)
 
     def to_dict(self):
         return {
             "id": self.id,
-            "nome": self.nome,
+            "name": self.name,
             "email": self.email,
-            "cargo": self.cargo,
+            "position": self.position,
             "salario": float(self.salario or 0),
-            "telefone": self.telefone,
-            "ativo": self.ativo,
-            "criado_em": self.criado_em,
+            "phone": self.phone,
+            "active": self.active,
+            "data_created": self.data_created.strftime("%d/%m/%Y %H:%M") if self.data_created else None,
         }

@@ -1,12 +1,109 @@
 <div class="header">
-            <a href="{{ url_for('views_bp.index') }}" class="marca">
-                <span>🍔</span> Hamburgueria Recreio
-            </a>
-            <button class="nav-toggle" id="navToggle" aria-label="Abrir Menu">☰</button>
-            <nav class="nav-bar" id="navBar">
-                <a href="{{ url_for('views_bp.index') }}" class="ativo">Cardápio</a>
-                <a href="{{ url_for('views_bp.about') }}">Sobre Nós</a>
-                <a href="{{ url_for('views_bp.contact') }}">Contato</a>
-                <a href="{{ url_for('views_bp.auth_selection') }}">Login</a>
-            </nav>
-        </div>
+    <a href="{{ url_for('views_bp.index') }}" class="marca">
+        <span>🍔</span> Hamburgueria Recreio
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir Menu">☰</button>
+    
+    <nav class="nav-bar d-flex align-items-center gap-3" id="navBar">
+        <a href="{{ url_for('views_bp.index') }}" class="{{ 'ativo' if request.endpoint == 'views_bp.public_index' else '' }}">Cardápio</a>
+        <a href="{{ url_for('views_bp.about') }}" class="{{ 'ativo' if request.endpoint == 'views_bp.about' else '' }}">Sobre Nós</a>
+        <a href="{{ url_for('views_bp.contact') }}" class="{{ 'ativo' if request.endpoint == 'views_bp.contact' else '' }}">Contato</a>
+
+        {% if session.get('admin_id') or session.get('employee_id') or session.get('user_id') %}
+            {% set is_admin = session.get('admin_id') is not none %}
+            {% set is_employee = session.get('employee_id') is not none %}
+            {% set display_name = session.get('admin_name') if is_admin else (session.get('employee_name') if is_employee else session.get('user_nome', 'Usuário')) %}
+            {% set initial = display_name[0]|upper if display_name else 'U' %}
+
+            <!-- Bolinha de Avatar + Dropdown estilo YouTube -->
+            <div class="dropdown ms-2">
+                <button class="btn p-0 border-0 rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                        type="button"
+                        id="userAvatarDropdown"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        title="{{ display_name }}"
+                        style="width: 40px; height: 40px; background-color: #f5b915; color: #121212; font-weight: 800; font-size: 1.05rem;">
+                    {{ initial }}
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow-lg mt-2"
+                    aria-labelledby="userAvatarDropdown"
+                    style="min-width: 230px; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;">
+                    
+                    <!-- Cabeçalho do menu com nome e cargo -->
+                    <li class="px-3 py-2 border-bottom border-secondary">
+                        <div class="fw-bold text-white text-truncate">{{ display_name }}</div>
+                        <small class="text-warning">
+                            {{ 'Administrador' if is_admin else ('Funcionário' if is_employee else 'Cliente') }}
+                        </small>
+                    </li>
+
+                    {% if is_admin %}
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ url_for('views_bp.dashboard') }}">
+                                📊 Painel / Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ url_for('product_bp.list_products') }}">
+                                🍔 Gerenciar Produtos
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ url_for('user_bp.list_users') }}">
+                                👥 Gerenciar Clientes
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ url_for('employee_bp.list_employees') }}">
+                                👨‍🍳 Gerenciar Funcionários
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ url_for('admin_bp.list_admins') }}">
+                                🛡️ Gerenciar Admins
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ url_for('admin_bp.edit_admin', admin_id=session.get('admin_id')) }}">
+                                ⚙️ Configurações da Conta
+                            </a>
+                        </li>
+                    {% elif is_employee %}
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ url_for('views_bp.dashboard') }}">
+                                📊 Painel / Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ url_for('product_bp.list_products') }}">
+                                🍔 Gerenciar Produtos
+                            </a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ url_for('views_bp.dashboard') }}">
+                                🏠 Meu Painel
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ url_for('user_bp.my_profile') }}">
+                                ⚙️ Configurações da Conta
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <li><hr class="dropdown-divider border-secondary"></li>
+                    <li>
+                        <a class="dropdown-item py-2 text-danger fw-semibold" href="{{ url_for('views_bp.logout') }}">
+                            🚪 Sair da conta
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        {% else %}
+            <a href="{{ url_for('views_bp.auth_selection') }}">Login</a>
+        {% endif %}
+    </nav>
+</div>

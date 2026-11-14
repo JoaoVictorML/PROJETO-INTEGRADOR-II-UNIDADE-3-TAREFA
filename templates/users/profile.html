@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card border-secondary p-4 shadow" style="background-color: #181818; border-radius: 15px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="fw-bold text-white mb-0">⚙️ Minha Conta</h4>
+                    <a href="{{ url_for('views_bp.dashboard') }}" class="btn btn-sm btn-outline-secondary text-light">
+                        Voltar ao Painel
+                    </a>
+                </div>
+
+                {% if success %}
+                <div class="alert alert-success small py-2">{{ success }}</div>
+                {% endif %}
+
+                {% if error %}
+                <div class="alert alert-danger small py-2">{{ error }}</div>
+                {% endif %}
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label text-light">Nome Completo *</label>
+                        <input type="text" name="nome" class="form-control" required
+                               value="{{ user.nome }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-light">E-mail de Acesso *</label>
+                        <input type="email" name="login" class="form-control" required
+                               value="{{ user.login }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-light">CPF ou Telefone *</label>
+                        <input type="text" name="cpf" class="form-control" required
+                               value="{{ user.cpf }}">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-light">Nova Senha (deixe em branco para manter a atual)</label>
+                        <input type="password" name="password" class="form-control" placeholder="••••••••">
+                    </div>
+
+                    <button type="submit" class="btn btn-warning w-100 fw-bold rounded-pill py-2">
+                        Salvar Alterações
+                    </button>
+                </form>
+
+                <hr class="border-secondary my-4">
+
+                <form action="{{ url_for('views_bp.delete_account') }}" method="POST"
+                      onsubmit="return confirm('Tem certeza que deseja excluir sua conta permanentemente?')">
+                    <button type="submit" class="btn btn-outline-danger w-100 rounded-pill py-2">
+                        Excluir Minha Conta
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

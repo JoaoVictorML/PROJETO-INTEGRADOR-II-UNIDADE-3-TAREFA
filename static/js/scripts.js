@@ -1,16 +1,12 @@
-// Dados dos Produtos baseados no cardápio
-const produtos = [
-    { id: 1, nome: "Double Burguer", categoria: "especiais", preco: 20.00, desc: "2 carnes artesanais, queijo duplo, bacon crocante, salada completa e molho especial." },
-    { id: 2, nome: "Burguer Calabresa", categoria: "especiais", preco: 18.00, desc: "Carne artesanal, fatias de calabresa selada, queijo derretido e maionese da casa." },
-    { id: 3, nome: "Tropical Burguer", categoria: "especiais", preco: 18.00, desc: "Carne artesanal, queijo cheddar, abacaxi grelhado, bacon e molho especial." },
-    { id: 4, nome: "Double Bacon", categoria: "especiais", preco: 22.00, desc: "2 carnes artesanais, cheddar duplo, dobro de bacon crocante e molho barbecue." },
-    { id: 5, nome: "Imperador", categoria: "especiais", preco: 19.00, desc: "Carne artesanal de 150g, queijo coalho grelhado, melaço e bacon crocante." },
-    { id: 6, nome: "Recreio Burguer", categoria: "especiais", preco: 22.00, desc: "O carro chefe! Carne artesanal, cheddar, bacon, picles, cebola roxa e molho Recreio." },
-    { id: 7, nome: "Serra Verde Burguer", categoria: "especiais", preco: 25.00, desc: "2 carnes artesanais, muito queijo, bacon, salada fresca e creme de gorgonzola." },
-    { id: 8, nome: "X-Burguer Tradicional", categoria: "tradicionais", preco: 12.00, desc: "Carne tradicional, queijo derretido e pão brioche macio." },
-    { id: 9, nome: "X-Salada Tradicional", categoria: "tradicionais", preco: 14.00, desc: "Carne tradicional, queijo, alface, tomate e maionese." },
-    { id: 10, nome: "Combo 1 - Recreio", categoria: "combos", preco: 30.00, desc: "1 Recreio Burguer + Batata Frita Individual + Refrigerante Lata." }
-];
+// Carrega os produtos enviados pelo Flask/MySQL
+const produtos = (window.PRODUTOS_BANCO || []).map(p => ({
+    id: p.id,
+    nome: p.name,
+    categoria: p.category,
+    preco: Number(p.price),
+    desc: p.description || "",
+    imagem: p.image_url || ""
+}));
 
 let carrinho = [];
 
@@ -27,17 +23,27 @@ const btnEnviarWhatsapp = document.getElementById('btnEnviarWhatsapp');
 
 // Renderizar Produtos
 function renderizarProdutos(categoriaFiltro = 'todos') {
+    if (!gridProdutos) return;
     gridProdutos.innerHTML = '';
-    
-    const produtosFiltrados = categoriaFiltro === 'todos' 
-        ? produtos 
+
+    const produtosFiltrados = categoriaFiltro === 'todos'
+        ? produtos
         : produtos.filter(p => p.categoria === categoriaFiltro);
+
+    if (produtosFiltrados.length === 0) {
+        gridProdutos.innerHTML = `
+            <p style="color: #aaa; grid-column: 1 / -1; text-align: center; padding: 2rem 0;">
+                Nenhum produto disponível nesta categoria no momento.
+            </p>`;
+        return;
+    }
 
     produtosFiltrados.forEach(produto => {
         const card = document.createElement('div');
         card.className = 'card-produto';
         card.innerHTML = `
             <div>
+                ${produto.imagem ? `<img src="${produto.imagem}" alt="${produto.nome}" style="width:100%; height:160px; object-fit:cover; border-radius:10px; margin-bottom:10px;">` : ''}
                 <span class="card-tag">${produto.categoria}</span>
                 <h3 class="card-titulo">${produto.nome}</h3>
                 <p class="card-descricao">${produto.desc}</p>
@@ -52,19 +58,22 @@ function renderizarProdutos(categoriaFiltro = 'todos') {
 }
 
 // Filtro de Categorias
-categoriasContainer.addEventListener('click', (e) => {
-    if (e.target.classList.contains('btn-categoria')) {
-        document.querySelectorAll('.btn-categoria').forEach(b => b.classList.remove('ativo'));
-        e.target.classList.add('ativo');
-        renderizarProdutos(e.target.dataset.cat);
-    }
-});
+if (categoriasContainer) {
+    categoriasContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-categoria')) {
+            document.querySelectorAll('.btn-categoria').forEach(b => b.classList.remove('ativo'));
+            e.target.classList.add('ativo');
+            renderizarProdutos(e.target.dataset.cat);
+        }
+    });
+}
 
 // Adicionar item ao Carrinho
 function adicionarAoCarrinho(id) {
     const produto = produtos.find(p => p.id === id);
-    const itemExistente = carrinho.find(item => item.id === id);
+    if (!produto) return;
 
+    const itemExistente = carrinho.find(item => item.id === id);
     if (itemExistente) {
         itemExistente.qtd++;
     } else {
@@ -87,8 +96,9 @@ function alterarQtd(id, delta) {
 
 // Atualizar Interface do Carrinho
 function atualizarCarrinho() {
+    if (!itensCarrinho) return;
     itensCarrinho.innerHTML = '';
-    
+
     if (carrinho.length === 0) {
         carrinhoVazio.style.display = 'block';
         resumoCarrinho.style.display = 'none';
@@ -122,40 +132,44 @@ function atualizarCarrinho() {
 }
 
 // Enviar Pedido para o WhatsApp
-btnEnviarWhatsapp.addEventListener('click', () => {
-    const nome = document.getElementById('nomeCliente').value.trim();
-    const endereco = document.getElementById('enderecoCliente').value.trim();
-    const pagamento = document.getElementById('pagamentoCliente').value;
+if (btnEnviarWhatsapp) {
+    btnEnviarWhatsapp.addEventListener('click', () => {
+        const nome = document.getElementById('nomeCliente').value.trim();
+        const endereco = document.getElementById('enderecoCliente').value.trim();
+        const pagamento = document.getElementById('pagamentoCliente').value;
 
-    if (!nome || !endereco) {
-        alert('Por favor, preencha seu nome e o endereço de entrega.');
-        return;
-    }
+        if (!nome || !endereco) {
+            alert('Por favor, preencha seu nome e o endereço de entrega.');
+            return;
+        }
 
-    let mensagem = `*NOVO PEDIDO - HAMBURGUERIA RECREIO*\n\n`;
-    mensagem += `*Cliente:* ${nome}\n`;
-    mensagem += `*Endereço:* ${endereco}\n`;
-    mensagem += `*Pagamento:* ${pagamento}\n\n`;
-    mensagem += `*ITENS:* \n`;
+        let mensagem = `*NOVO PEDIDO - HAMBURGUERIA RECREIO*\n\n`;
+        mensagem += `*Cliente:* ${nome}\n`;
+        mensagem += `*Endereço:* ${endereco}\n`;
+        mensagem += `*Pagamento:* ${pagamento}\n\n`;
+        mensagem += `*ITENS:* \n`;
 
-    let total = 0;
-    carrinho.forEach(item => {
-        const subtotal = item.preco * item.qtd;
-        total += subtotal;
-        mensagem += `• ${item.qtd}x ${item.nome} - R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
+        let total = 0;
+        carrinho.forEach(item => {
+            const subtotal = item.preco * item.qtd;
+            total += subtotal;
+            mensagem += `• ${item.qtd}x ${item.nome} - R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
+        });
+
+        mensagem += `\n*TOTAL:* R$ ${total.toFixed(2).replace('.', ',')}`;
+
+        const telefone = "5588993810676";
+        const url = `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
+        window.open(url, '_blank');
     });
-
-    mensagem += `\n*TOTAL:* R$ ${total.toFixed(2).replace('.', ',')}`;
-
-    const telefone = "5588993810676";
-    const url = `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
-    window.open(url, '_blank');
-});
+}
 
 // Menu Mobile
-navToggle.addEventListener('click', () => {
-    navBar.classList.toggle('aberto');
-});
+if (navToggle && navBar) {
+    navToggle.addEventListener('click', () => {
+        navBar.classList.toggle('aberto');
+    });
+}
 
 // Inicialização
 renderizarProdutos();

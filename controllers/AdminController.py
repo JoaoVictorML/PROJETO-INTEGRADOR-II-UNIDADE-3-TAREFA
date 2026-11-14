@@ -1,24 +1,24 @@
 from models.Geral import Session
-from models.Employeer import Employeer
+from models.Admin import Admin
 
 def cadastrar_usuario(fullname, email, cpf_input, password, confirm_password):
     session = Session()
     try:
-        usuario_existente = session.query(Employeer).filter(Employeer.login == email).first()
+        usuario_existente = session.query(Admin).filter(Admin.login == email).first()
         if usuario_existente:
             return False, "Este e-mail já está cadastrado!"
 
-        employeer = Employeer()
-        employeer.nome = fullname      
-        employeer.login = email        
-        employeer.cpf = cpf_input 
-        employeer.password = password
-        employeer.cpassword = confirm_password 
+        admin = Admin()
+        admin.name = fullname      
+        admin.login = email        
+        admin.cpf = cpf_input 
+        admin.password = password
+        admin.cpassword = confirm_password 
 
-        if employeer.password != employeer.cpassword:
+        if admin.password != admin.cpassword:
             return False, "A senha e a confirmação de senha devem ser iguais."
         
-        session.add(employeer)
+        session.add(admin)
         session.commit()
         return True, "Usuário cadastrado com sucesso!"
         

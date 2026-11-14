@@ -12,9 +12,16 @@
         </p>
       </div>
 
+      {% if error %}
+      <div class="alert alert-danger small py-2 text-start" role="alert">
+        {{ error }}
+      </div>
+      {% endif %}
+
       <div id="loginError" class="alert alert-danger d-none small py-2 text-start" role="alert"></div>
 
-      <form id="formLogin" method="POST" action="/signin">
+      <!-- action="" envia o POST para a própria rota que abriu a página (/admin/login ou /signin) -->
+      <form id="formLogin" method="POST" action="">
         <div class="mb-3 text-start">
           <label for="email" class="form-label fw-medium">E-mail</label>
           <input type="email" class="form-control" id="email" name="email" required placeholder="exemplo@email.com" />

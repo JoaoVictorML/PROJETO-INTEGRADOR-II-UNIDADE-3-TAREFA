@@ -1,22 +1,80 @@
 {% extends "base.html" %}
 
-{% block title %}Formulário de Funcionários - Hamburgueria Recreio{% endblock %}
-
 {% block content %}
-    <h1>Formulário de Funcionários</h1>
-    <form method="POST" action="{{ url_for('views_bp.save_employee') }}">
-        <div class="form-group">
-            <label for="fullname">Nome Completo</label>
-            <input type="text" class="form-control" id="fullname" name="fullname" required>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card border-secondary p-4 shadow" style="background-color: #181818; border-radius: 15px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="fw-bold text-white mb-0">
+                        {{ 'Editar Funcionário' if employee else 'Novo Funcionário' }}
+                    </h4>
+                    <a href="{{ url_for('employee_bp.list_employees') }}" class="btn btn-sm btn-outline-secondary text-light">
+                        Voltar
+                    </a>
+                </div>
+
+                {% if error %}
+                <div class="alert alert-danger small py-2">{{ error }}</div>
+                {% endif %}
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label text-light">Nome Completo *</label>
+                        <input type="text" name="fullname" class="form-control" required
+                               placeholder="Ex: Carlos Eduardo"
+                               value="{{ employee.fullname if employee else '' }}">
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label text-light">Cargo / Função *</label>
+                            <select name="role" class="form-select">
+                                {% set cargo = employee.role if employee else 'Atendente' %}
+                                <option value="Atendente" {{ 'selected' if cargo == 'Atendente' }}>Atendente / Caixa</option>
+                                <option value="Chapeiro" {{ 'selected' if cargo == 'Chapeiro' }}>Chapeiro / Cozinha</option>
+                                <option value="Entregador" {{ 'selected' if cargo == 'Entregador' }}>Entregador</option>
+                                <option value="Gerente de Turno" {{ 'selected' if cargo == 'Gerente de Turno' }}>Gerente de Turno</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label text-light">Telefone / WhatsApp</label>
+                            <input type="text" name="phone" class="form-control"
+                                   placeholder="(88) 99999-9999"
+                                   value="{{ employee.phone if employee else '' }}">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-light">E-mail de Acesso *</label>
+                        <input type="email" name="email" class="form-control" required
+                               placeholder="funcionario@hrecreio.com"
+                               value="{{ employee.email if employee else '' }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-light">
+                            {{ 'Nova Senha (deixe em branco para manter a atual)' if employee else 'Senha de Acesso *' }}
+                        </label>
+                        <input type="password" name="password" class="form-control"
+                               {{ 'required' if not employee else '' }}
+                               placeholder="••••••••">
+                    </div>
+
+                    <div class="form-check form-switch mb-4">
+                        <input class="form-check-input" type="checkbox" id="empActiveSwitch" name="active"
+                               {{ 'checked' if (not employee or employee.active) }}>
+                        <label class="form-check-label text-light" for="empActiveSwitch">
+                            Funcionário ativo no sistema
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning w-100 fw-bold rounded-pill py-2">
+                        {{ 'Salvar Alterações' if employee else 'Cadastrar Funcionário' }}
+                    </button>
+                </form>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-            <label for="phone">Telefone</label>
-            <input type="text" class="form-control" id="phone" name="phone" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Salvar</button>
-    </form>
+    </div>
+</div>
 {% endblock %}

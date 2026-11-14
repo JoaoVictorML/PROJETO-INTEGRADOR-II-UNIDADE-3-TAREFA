@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pb-3 mb-4 border-bottom border-secondary">
+        <div>
+            <h2 class="fw-bold text-white mb-0">👥 Clientes Cadastrados</h2>
+            <small class="text-muted">Gerencie os usuários comuns da Hamburgueria Recreio</small>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('views_bp.dashboard') }}" class="btn btn-outline-light rounded-pill px-3">
+                ← Painel
+            </a>
+            <a href="{{ url_for('user_bp.create_user') }}" class="btn btn-warning fw-bold rounded-pill px-4">
+                + Novo Cliente
+            </a>
+        </div>
+    </div>
+
+    {% if users %}
+    <div class="card border-secondary p-3" style="background-color: #181818; border-radius: 14px;">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0">
+                <thead>
+                    <tr class="text-warning">
+                        <th>#ID</th>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>CPF / Telefone</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td class="text-muted">#{{ u.id }}</td>
+                        <td class="fw-bold text-white">{{ u.nome }}</td>
+                        <td>{{ u.login }}</td>
+                        <td>{{ u.cpf }}</td>
+                        <td class="text-end">
+                            <a href="{{ url_for('user_bp.edit_user', user_id=u.id) }}" class="btn btn-sm btn-outline-warning me-1">
+                                Editar
+                            </a>
+                            <form action="{{ url_for('user_bp.delete_user', user_id=u.id) }}" method="POST" class="d-inline"
+                                  onsubmit="return confirm('Excluir o cliente {{ u.nome }}?')">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="card border-secondary p-5 text-center" style="background-color: #181818; border-radius: 14px;">
+        <div style="font-size: 2.5rem;">👥</div>
+        <h5 class="text-white mt-2">Nenhum cliente cadastrado ainda</h5>
+        <p class="text-muted small mb-3">Os clientes que se cadastrarem no site aparecerão aqui.</p>
+        <div>
+            <a href="{{ url_for('user_bp.create_user') }}" class="btn btn-warning fw-bold rounded-pill px-4">
+                + Cadastrar Cliente
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

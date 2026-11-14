@@ -1,16 +1,26 @@
 from models.Geral import Base, engine
-from models.Admin import Admin
 from repositories.admin_repository import AdminRepository
 
+# Cria as tabelas (se ainda não existirem)
 Base.metadata.create_all(engine)
 
-ok, result = AdminRepository.create({
-    "nome": "Administrador",
+# Dados do primeiro administrador
+dados_admin = {
+    "name": "Administrador",
     "email": "administrator@gmail.com",
     "password": "admi123",
-    "cargo": "Administrador",
-    "salario": "0",
-    "telefone": "",
-    "ativo": True,
-})
-print("Criado!" if ok else f"Erro: {result}")
+    "position": "Administrador",
+    "salario": "0",          # agora usa "salario" (não mais "wage")
+    "phone": "",
+    "active": True,
+}
+
+ok, result = AdminRepository.create(dados_admin)
+
+if ok:
+    print("✅ Administrador criado com sucesso!")
+    print(f"   ID: {result['id']}")
+    print(f"   Nome: {result['name']}")
+    print(f"   E-mail: {result['email']}")
+else:
+    print(f"❌ Erro ao criar administrador: {result}")
